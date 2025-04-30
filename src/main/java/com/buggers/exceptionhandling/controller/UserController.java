@@ -1,8 +1,9 @@
 package com.buggers.exceptionhandling.controller;
 
 
-import com.buggers.exceptionhandling.dto.User;
+import com.buggers.exceptionhandling.dto.UserDTO;
 import com.buggers.exceptionhandling.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,37 +22,29 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-
-        var responseBody = userService.addUser(user);
-        var customResponseHeaders = new HttpHeaders();
-        customResponseHeaders.add("custom-header", "custom-header-value");
-
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO) {
+        userService.addUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .headers(customResponseHeaders)
-                .body(responseBody);
+                .build();
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers() {
-
+    public ResponseEntity<List<UserDTO>> getUsers() {
         var responseBody = userService.getUsers();
         return ResponseEntity.ok(responseBody);
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<Void> updateUser(@PathVariable("userId") String userId, @RequestBody User user) {
-
-        var isUpdated = userService.updateUser(userId, user);
-        return ResponseEntity.status(isUpdated ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND)
+    public ResponseEntity<Void> updateUser(@PathVariable("userId") String userId, @Valid @RequestBody UserDTO userDTO) {
+        userService.updateUser(userId, userDTO);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") String userId) {
-
-        var isDeleted = userService.deleteUser(userId);
-        return ResponseEntity.status(isDeleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND)
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 

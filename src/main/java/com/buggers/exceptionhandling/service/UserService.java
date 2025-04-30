@@ -2,17 +2,17 @@ package com.buggers.exceptionhandling.service;
 
 
 
-import com.buggers.exceptionhandling.dto.User;
+import com.buggers.exceptionhandling.dto.UserDTO;
 
 import java.util.List;
 
 
 public interface UserService {
-    User addUser(User user);
+    void addUser(UserDTO userDTO);
 
-    List<User> getUsers();
+    List<UserDTO> getUsers();
 
-    boolean updateUser(String userId, User user);
+    void updateUser(String userId, UserDTO userDTO);
 
-    boolean deleteUser(String userId);
+    void deleteUser(String userId);
 }
