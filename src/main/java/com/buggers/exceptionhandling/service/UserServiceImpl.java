@@ -1,6 +1,8 @@
 package com.buggers.exceptionhandling.service;
 
-import com.buggers.exceptionhandling.dto.User;
+import com.buggers.exceptionhandling.dto.UserDTO;
+import com.buggers.exceptionhandling.exception.ErrorMessage;
+import com.buggers.exceptionhandling.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,41 +12,45 @@ import java.util.Objects;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final List<User> users;
+    private final List<UserDTO> userDTOS;
 
     UserServiceImpl() {
-        users = new ArrayList<>();
+        userDTOS = new ArrayList<>();
     }
 
     @Override
-    public User addUser(User user) {
-        users.add(user);
-        return user;
+    public void addUser(UserDTO userDTO) {
+        userDTOS.add(userDTO);
+
     }
 
     @Override
-    public List<User> getUsers() {
-        return users;
+    public List<UserDTO> getUsers() {
+        return userDTOS;
     }
 
     @Override
-    public boolean updateUser(String userId, User updatedUser) {
+    public void updateUser(String userId, UserDTO updatedUserDTO) {
 
-        return users.stream()
-                .filter(user -> user.getUserId().equals(updatedUser.getUserId()))
+         userDTOS.stream()
+                .filter(userDTO -> userDTO.getUserId().equals(updatedUserDTO.getUserId()))
                 .findFirst()
-                .map(user -> {
-                    user.setUserName(updatedUser.getUserName());
-                    user.setEmail(updatedUser.getEmail());
-                    user.setUserId(updatedUser.getUserId());
-                    user.setPassword(updatedUser.getPassword());
-                    return true;
-                }).orElse(false);
+                .map(userDTO -> {
+                    userDTO.setUsername(updatedUserDTO.getUsername());
+                    userDTO.setEmail(updatedUserDTO.getEmail());
+                    userDTO.setUserId(updatedUserDTO.getUserId());
+                    userDTO.setPassword(updatedUserDTO.getPassword());
+                    return  userDTO;
+                }).orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Override
-    public boolean deleteUser(String userId) {
-        return users.removeIf(user -> Objects.equals(user.getUserId(), userId));
+    public void deleteUser(String userId) {
+        var isRemoved = userDTOS.removeIf(userDTO -> Objects.equals(userDTO.getUserId(), userId));
+        if (!isRemoved) {
+            throw new ResourceNotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
     }
 
 }
